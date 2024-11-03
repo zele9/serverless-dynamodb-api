@@ -29,7 +29,8 @@ Deploy the Service:
 bash
 serverless deploy --aws-profile Ataba
 Endpoints
-Create Customer
+
+Create Customer endpoint
 Method: POST
 
 URL: https://b1adwwc45b.execute-api.us-east-1.amazonaws.com/
@@ -61,8 +62,8 @@ json
   ]
 }
 Handler Functions
-createCustomer.js
-javascript
+
+createCustomer.js code
 'use strict';
 const AWS = require('aws-sdk');
 
@@ -83,8 +84,8 @@ module.exports.createCustomer = async (event) => {
     body: JSON.stringify({ message: "Customer created successfully" })
   };
 };
-getCustomer.js
-javascript
+
+getCustomer.js code
 'use strict';
 const AWS = require('aws-sdk');
 
@@ -112,7 +113,6 @@ module.exports.getCustomer = async (event) => {
     })
   };
 };
+
 License
 This project is licensed under the MIT License.
-
-Replace placeholders like yourusername, your-repo, and YOUR_API_ENDPOINT with your actual GitHub username, repository name, and API Gateway endpoint.
