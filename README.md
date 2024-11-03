@@ -1,118 +1,69 @@
-# Serverless DynamoDB API
-This project is a Serverless API built with AWS Lambda, API Gateway, and DynamoDB. It provides functionality to create and retrieve customer records. The goal of this project is to demonstrate how to build and deploy a serverless application using modern cloud technologies.
-The API includes the following features:
-Create Customer: A POST endpoint to add new customer data to DynamoDB.
-Get Customers: A GET endpoint to retrieve all customer records from DynamoDB.
-This project is ideal for learning how to handle serverless infrastructure and integrate various AWS services seamlessly.
-## Features
+<!--
+title: 'AWS Simple HTTP Endpoint example in NodeJS'
+description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
+layout: Doc
+framework: v4
+platform: AWS
+language: nodeJS
+authorLink: 'https://github.com/serverless'
+authorName: 'Serverless, Inc.'
+authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
+-->
 
-- **Create Customer**: Adds a new customer to the DynamoDB table.
-- **Get Customers**: Retrieves all customers from the DynamoDB table.
+# Serverless Framework Node HTTP API on AWS
 
-## Prerequisites
+This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
 
-- Node.js (v20.x or later)
-- Serverless Framework
-- AWS Account
+This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
 
-## Setup
-Install Dependencies:
+## Usage
 
-bash
-npm install
-Configure AWS Credentials: Ensure your AWS CLI is configured with your credentials:
+### Deployment
 
-bash
-aws configure
-Deploy the Service:
+In order to deploy the example, you need to run the following command:
 
-bash
-serverless deploy --aws-profile Ataba
-Endpoints
+```
+serverless deploy
+```
 
-Create Customer endpoint
-Method: POST
+After running deploy, you should see output similar to:
 
-URL: https://b1adwwc45b.execute-api.us-east-1.amazonaws.com/
+```
+Deploying "serverless-http-api" to stage "dev" (us-east-1)
 
-Request Body:
+✔ Service deployed to stack serverless-http-api-dev (91s)
 
-json
-{
-  "name": "Emmanuel Ataba",
-  "email": "atabazele@outlook.com"
-}
-Response: 201 Created
+endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
+functions:
+  hello: serverless-http-api-dev-hello (1.6 kB)
+```
 
-Get Customers
-Method: GET
+_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [HTTP API (API Gateway V2) event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api).
 
-URL: https://b1adwwc45b.execute-api.us-east-1.amazonaws.com/
+### Invocation
 
-Response:
+After successful deployment, you can call the created application via HTTP:
 
-json
-{
-  "total": 1,
-  "items": [
-    {
-      "name": "Emmanuel Ataba",
-      "email": "atabazele@outlook.com"
-    }
-  ]
-}
-Handler Functions
+```
+curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
+```
 
-createCustomer.js code
-'use strict';
-const AWS = require('aws-sdk');
+Which should result in response similar to:
 
-module.exports.createCustomer = async (event) => {
-  const body = JSON.parse(event.body);
-  const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const putParams = {
-    TableName: process.env.DYNAMODB_CUSTOMER_TABLE,
-    Item: {
-      primary_key: body.name,
-      email: body.email
-    }
-  };
-  await dynamoDb.put(putParams).promise();
+```json
+{ "message": "Go Serverless v4! Your function executed successfully!" }
+```
 
-  return {
-    statusCode: 201,
-    body: JSON.stringify({ message: "Customer created successfully" })
-  };
-};
+### Local development
 
-getCustomer.js code
-'use strict';
-const AWS = require('aws-sdk');
+The easiest way to develop and test your function is to use the `dev` command:
 
-module.exports.getCustomer = async (event) => {
-  const scanParams = {
-    TableName: process.env.DYNAMODB_CUSTOMER_TABLE
-  };
-  const dynamoDb = new AWS.DynamoDB.DocumentClient();
-  const result = await dynamoDb.scan(scanParams).promise();
+```
+serverless dev
+```
 
-  if (result.Count === 0) {
-    return {
-      statusCode: 404
-    };
-  }
+This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      total: result.Count,
-      items: result.Items.map(customer => ({
-        name: customer.primary_key,
-        email: customer.email
-      }))
-    })
-  };
-};
+Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
 
-License
-This project is licensed under the MIT License.
+When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
